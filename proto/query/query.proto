@@ -1,0 +1,26 @@
+syntax = "proto3";
+package demo.query;
+
+option go_package = "trpc-query-demo/proto/query";
+//trpc create -f --protofile=query.proto --protocol=trpc --rpconly --nogomod --mock=false
+message QueryRequest {
+  string queryText = 1;
+}
+
+message RowData {
+  int32 id = 1;
+  string askText = 2;
+  string titleText = 3;
+  string replyText = 4;
+}
+
+message QueryResponse {
+  string duration = 1;
+  int32 count = 2;
+  repeated RowData rows = 3;
+  string error = 4;
+}
+
+service QueryService {
+    rpc Query(QueryRequest) returns (QueryResponse);
+}
