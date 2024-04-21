@@ -2,7 +2,7 @@ server:
   service:
     - name: demo.query.QueryService
       # nic: eth0
-      ip: 127.0.0.1
+      ip: 129.204.44.167
       port: 8000
       network: tcp
       protocol: http
