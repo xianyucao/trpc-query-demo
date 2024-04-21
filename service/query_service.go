@@ -18,10 +18,10 @@ import (
 var (
 	rdb = redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379", // Redis服务器地址
-		Password: "123456",
+		Password: "",
 		DB:       0,
 	})
-	dsn = "root:cxy010034@tcp(127.0.0.1:3306)/messageboard" // 数据库DSN
+	dsn = "root:@tcp(129.204.44.167:3306)/messageboard" // 数据库DSN
 )
 
 // 定义了QueryServiceImpl类型来实现protobuf文件中定义的服务接口
