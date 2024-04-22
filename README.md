@@ -15,4 +15,4 @@ go mod tidy
 
 //启动go run . -conf config/trpc_go.yaml
 //连接本地mysql，redis缓存，实现通过输入关键字实现查询
-//访问方式如：curl "http://localhost:8000/demo.query.QueryService/Query?queryText=安置"
+//访问方式如：curl "http://129.204.44.167:8000/demo.query.QueryService/Query?queryText=胶南市粮油加工厂"

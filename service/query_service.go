@@ -17,7 +17,7 @@ import (
 // 定义全局Redis和MySQL
 var (
 	rdb = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379", // Redis服务器地址
+		Addr:     "127.0.0.1:6379", // Redis服务器地址
 		Password: "",
 		DB:       0,
 	})
@@ -112,7 +112,12 @@ func (service *QueryServiceImpl) Query(ctx context.Context, req *query.QueryRequ
 	if err != nil {
 		log.Printf("Failed to marshal response: %v", err)
 	} else {
-		if err := rdb.Set(ctx, queryText, string(responseJSON), 10*time.Minute).Err(); err != nil {
+		// 创建一个新的context，用于Redis操作，设置更长的超时时间
+		cacheCtx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+		defer cancel() // 确保新创建的context被正确释放
+
+		// 使用新的context来设置缓存
+		if err := rdb.Set(cacheCtx, queryText, string(responseJSON), 10*time.Minute).Err(); err != nil {
 			log.Printf("Failed to set cache: %v", err)
 		}
 	}
