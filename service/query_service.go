@@ -47,9 +47,24 @@ func (service *QueryServiceImpl) Query(ctx context.Context, req *query.QueryRequ
 	if queryText == "" {
 		return nil, fmt.Errorf("queryText parameter is missing")
 	}
+	page := req.GetPage() // 获取请求的页码
+	if page <= 0 {
+		page = 1 // 默认值为第1页
+	}
+	perPage := req.GetPerPage() // 获取每页的结果数量
+	if perPage <= 0 {
+		perPage = 100 // 默认值为每页100条
+	}
+
+	// 计算查询偏移量
+	offset := (page - 1) * perPage
 
 	// 尝试从Redis获取缓存结果
-	cachedResult, err := rdb.Get(ctx, queryText).Result()
+	// 生成包含查询文本、页码和每页条数的唯一缓存键
+	cachedKey := fmt.Sprintf("%s_%d_%d", queryText, page, perPage)
+
+	// 尝试从Redis获取缓存结果
+	cachedResult, err := rdb.Get(ctx, cachedKey).Result()
 	if err == nil {
 		var response query.QueryResponse
 		if err := json.Unmarshal([]byte(cachedResult), &response); err == nil {
@@ -67,9 +82,9 @@ func (service *QueryServiceImpl) Query(ctx context.Context, req *query.QueryRequ
 
 	startTime := time.Now()
 
-	sqlQuery := "SELECT ID, AskText, TitleText, ReplyText FROM `messegetext` WHERE AskText LIKE ?"
+	sqlQuery := "SELECT ID, AskText, TitleText, ReplyText FROM `messegetext` WHERE AskText LIKE ? LIMIT ? OFFSET ?"
 	likeText := "%" + queryText + "%"
-	rows, err := db.Query(sqlQuery, likeText)
+	rows, err := db.Query(sqlQuery, likeText, perPage, offset)
 	if err != nil {
 		log.Fatal("Query failed:", err)
 	}
@@ -117,7 +132,7 @@ func (service *QueryServiceImpl) Query(ctx context.Context, req *query.QueryRequ
 		defer cancel() // 确保新创建的context被正确释放
 
 		// 使用新的context来设置缓存
-		if err := rdb.Set(cacheCtx, queryText, string(responseJSON), 10*time.Minute).Err(); err != nil {
+		if err := rdb.Set(cacheCtx, cachedKey, string(responseJSON), 10*time.Minute).Err(); err != nil {
 			log.Printf("Failed to set cache: %v", err)
 		}
 	}

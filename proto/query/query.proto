@@ -5,6 +5,8 @@ option go_package = "trpc-query-demo/proto/query";
 //trpc create -f --protofile=query.proto --protocol=trpc --rpconly --nogomod --mock=false
 message QueryRequest {
   string queryText = 1;
+  int32 page = 2;       // 新增分页参数：页码
+  int32 perPage = 3;    // 新增分页参数：每页数量
 }
 
 message RowData {
