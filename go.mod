@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.8.1
+	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da
 	google.golang.org/protobuf v1.33.0
 	trpc.group/trpc-go/trpc-go v1.0.2
 )
